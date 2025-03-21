@@ -45,11 +45,11 @@ void RayTracer::raytraceScene(FrameBuffer& frameBuffer, int depth,
 
 			Ray ray = camera.getRay(x, y);
 
-			color col = traceIndividualRay(ray, theScene, 0);
+			color col = traceIndividualRay(ray, theScene, 3);
 
 			frameBuffer.setColor(x, y, col);
 
-			frameBuffer.showAxes(x, y, ray, 0.25);			// Displays R/x, G/y, B/z axes
+			// frameBuffer.showAxes(x, y, ray, 0.25);			// Displays R/x, G/y, B/z axes
 		}
 	}
 
@@ -72,12 +72,52 @@ color RayTracer::traceIndividualRay(const Ray& ray, const IScene& theScene, int 
 
     VisibleIShape::findIntersection(ray, theScene.opaqueObjs, hit);
 
-	if (hit.t != FLT_MAX) {
-		color C = hit.material.diffuse;
-		return C;
-	}
+	if (hit.t < FLT_MAX) {
+        color accumulatedColor = black;
+
+        for (auto& light : theScene.lights) {
+            dvec3 normal = hit.normal;
+
+            // Check if backside
+            if (glm::dot(ray.dir, hit.normal) > 0) {
+                normal = -normal;
+            }
+
+            
+            bool inShadow = light->pointIsInAShadow(
+                hit.interceptPt,
+                /* hit.normal, */
+                normal,
+                theScene.opaqueObjs,
+                theScene.camera->getFrame()
+            );
+
+            accumulatedColor += light->illuminate(
+                hit.interceptPt,
+                /* hit.normal, */
+                normal,
+                hit.material,
+                theScene.camera->getFrame(),
+                inShadow
+            );
+        }
+
+		if (recursionLevel > 0) {
+			Ray reflectionRay(hit.interceptPt + EPSILON * hit.normal, glm::reflect(ray.dir, hit.normal));
+
+			accumulatedColor += 0.5 * traceIndividualRay(reflectionRay, theScene, recursionLevel - 1);
+		}
+
+		// return accumulatedColor;
+	    return glm::clamp(accumulatedColor, 0.0, 1.0);
+    }
 	else
 	{
-		return defaultColor;
+		if (recursionLevel == 3) {
+			return defaultColor;
+		}
+		else {
+			return defaultColor * 0.1;
+		}
 	}
 }

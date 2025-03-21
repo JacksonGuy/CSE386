@@ -765,11 +765,19 @@ void ICylinderY::findClosestIntersection(const Ray& ray, HitRecord& hit) const {
 	HitRecord hits[2];
 	int numHits = IQuadricSurface::findIntersections(ray, hits);
 
-	if (numHits == 0) {
-		hit.t = FLT_MAX;
-	} else {
-		hit = hits[0];
-	}
+    if (numHits == 0) {
+        hit.t = FLT_MAX;
+        return;
+    }
+
+    for (int i = 0; i < numHits; i++) {
+        if (hits[i].interceptPt.y < (this->center.y + this->length/2) &&
+            hits[i].interceptPt.y > (this->center.y - this->length/2)) 
+        {
+            hit = hits[i];
+            return;
+        }
+    }
 }
 
 /**

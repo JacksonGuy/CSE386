@@ -26,7 +26,7 @@ FrameBuffer frameBuffer(WINDOW_WIDTH, WINDOW_HEIGHT);
 RayTracer rayTrace(paleGreen);
 
 dvec3 cameraPos(0, 5, 10);
-dvec3 cameraFocus(0, 5, 0);
+dvec3 cameraFocus(0, 0, 0);
 dvec3 cameraUp = Y_AXIS;
 double cameraFOV = PI_2;
 
@@ -38,7 +38,7 @@ void render() {
 	int height = frameBuffer.getWindowHeight();
 
 	scene.camera = new PerspectiveCamera(cameraPos, cameraFocus, cameraUp, cameraFOV, width, height);
-	rayTrace.raytraceScene(frameBuffer, 0, scene);
+	rayTrace.raytraceScene(frameBuffer, 3, scene);
 
 	int frameEndTime = glutGet(GLUT_ELAPSED_TIME); // Get end time
 	double totalTimeSec = (frameEndTime - frameStartTime) / 1000.0;

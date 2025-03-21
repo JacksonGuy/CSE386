@@ -20,8 +20,7 @@
    */
 
 color ambientColor(const color& mat, const color& lightColor) {
-	/* CSE 386 - todo  */
-	return mat;
+	return mat * lightColor;
 }
 
 /**
@@ -35,9 +34,9 @@ color ambientColor(const color& mat, const color& lightColor) {
  */
 
 color diffuseColor(const color& mat, const color& lightColor,
-	const dvec3& l, const dvec3& n) {
-	/* CSE 386 - todo  */
-	return mat;
+    	const dvec3& l, const dvec3& n) 
+{
+	return mat * lightColor * glm::max(glm::dot(l, n), 0.0);
 }
 
 /**
@@ -53,10 +52,11 @@ color diffuseColor(const color& mat, const color& lightColor,
  */
 
 color specularColor(const color& mat, const color& lightColor,
-	double shininess,
-	const dvec3& r, const dvec3& v) {
-	/* CSE 386 - todo  */
-	return mat;
+        double shininess,
+        const dvec3& r, const dvec3& v) 
+{
+	double factor = glm::pow(glm::max(0.0, glm::dot(r, v)), shininess);
+    return factor * mat * lightColor;
 }
 
 /**
@@ -79,12 +79,32 @@ color specularColor(const color& mat, const color& lightColor,
  */
 
 color totalColor(const Material& mat, const color& lightColor,
-	const dvec3& v, const dvec3& n,
-	const dvec3& lightPos, const dvec3& intersectionPt,
-	bool attenuationOn,
-	const LightATParams& ATparams) {
-	/* CSE 386 - todo  */
-	return mat.diffuse;
+        const dvec3& v, const dvec3& n,
+        const dvec3& lightPos, const dvec3& intersectionPt,
+        bool attenuationOn, const LightATParams& ATparams) 
+{
+    // Calculate vectors for color calcs
+    dvec3 lightVector = lightPos - intersectionPt;
+    dvec3 lightVectorNorm = glm::normalize(lightVector);
+    dvec3 reflectionVector = glm::reflect(-lightVectorNorm, n);
+
+    // Calculate Color Values
+	color ambientReflection = ambientColor(mat.ambient, lightColor);
+    color diffuseReflection = diffuseColor(
+        mat.diffuse, lightColor, lightVectorNorm, n
+    );
+    color specularReflection = specularColor(
+        mat.specular, lightColor, mat.shininess, reflectionVector, v
+    );
+
+    // Find attenuation
+    double attenuationFactor = attenuationOn ? 
+        ATparams.factor(glm::length(lightVector)) : 1.0f;
+
+    color finalColor = ambientReflection + 
+        ( attenuationFactor * (diffuseReflection + specularReflection));
+
+    return glm::clamp(finalColor, 0.0, 1.0);
 }
 
 /**
@@ -101,12 +121,27 @@ color totalColor(const Material& mat, const color& lightColor,
  */
 
 color PositionalLight::illuminate(const dvec3& interceptWorldCoords,
-	const dvec3& normal,
-	const Material& material,
-	const Frame& eyeFrame,
-	bool inShadow) const {
-	/* CSE 386 - todo  */
-	return material.diffuse;
+        const dvec3& normal, const Material& material,
+        const Frame& eyeFrame, bool inShadow) const 
+{
+    if (!this->isOn) return black;
+    if (inShadow) return ambientColor(material.ambient, this->lightColor);
+
+    // Calculate View Vector
+    dvec3 viewVector = eyeFrame.origin - interceptWorldCoords;
+    viewVector = glm::normalize(viewVector);
+    
+    // Position of light adjusted to appropriate coordinate frame
+    dvec3 lightPos = actualPosition(eyeFrame); 
+
+    // Calculate light color
+    color totalColorCalc = totalColor(
+        material, this->lightColor,
+        viewVector, normal, lightPos, interceptWorldCoords,
+        this->attenuationIsTurnedOn, this->atParams
+    );
+    
+    return totalColorCalc;
 }
 
 /*
@@ -133,9 +168,24 @@ dvec3 PositionalLight::actualPosition(const Frame& eyeFrame) const {
 bool PositionalLight::pointIsInAShadow(const dvec3& intercept,
 	const dvec3& normal,
 	const vector<VisibleIShapePtr>& objects,
-	const Frame& eyeFrame) const {
-	/* CSE 386 - todo  */
-	return false;
+	const Frame& eyeFrame) const 
+{
+    dvec3 lightVector = this->pos - intercept;   
+    double distToLight = glm::length(lightVector);
+    Ray shadowFeeler(intercept + EPSILON * normal, lightVector);
+
+    // Ray shadowFeeler = getShadowFeeler(intercept, normal, eyeFrame);
+
+    OpaqueHitRecord shadowHit;
+    VisibleIShape::findIntersection(shadowFeeler, objects, shadowHit);
+
+    if (shadowHit.t > distToLight) {
+        return false;
+    }
+
+    return true;
+
+    return (shadowHit.t > distToLight) ? false : true;
 }
 
 /**
@@ -148,11 +198,13 @@ bool PositionalLight::pointIsInAShadow(const dvec3& intercept,
 
 Ray PositionalLight::getShadowFeeler(const dvec3& interceptWorldCoords,
 	const dvec3& normal,
-	const Frame& eyeFrame) const {
-	/* 386 - todo */
-	dvec3 origin(0, 0, 0);
-	dvec3 dir(1, 1, 1);
-	Ray shadowFeeler(origin, dir);
+	const Frame& eyeFrame) const 
+{
+    dvec3 origin = interceptWorldCoords + EPSILON * normal;
+    dvec3 dir = this->pos - interceptWorldCoords;
+
+    Ray shadowFeeler(origin, dir);
+
 	return shadowFeeler;
 }
 
@@ -175,7 +227,7 @@ color SpotLight::illuminate(const dvec3& interceptWorldCoords,
 	const Frame& eyeFrame,
 	bool inShadow) const {
 	/* CSE 386 - todo  */
-	return material.diffuse;
+	return black;
 }
 
 /**
