@@ -29,7 +29,7 @@ RayTracer::RayTracer(const color& defa)
  */
 
 void RayTracer::raytraceScene(FrameBuffer& frameBuffer, int depth,
-	const IScene& theScene) const {
+	const IScene& theScene, int N) const {
 	const RaytracingCamera& camera = *theScene.camera;
 	const vector<VisibleIShapePtr>& objs = theScene.opaqueObjs;
 	const vector<LightSourcePtr>& lights = theScene.lights;
@@ -41,13 +41,25 @@ void RayTracer::raytraceScene(FrameBuffer& frameBuffer, int depth,
 			if (DEBUG_PIXEL) {
 				cout << "";
 			}
-			/* CSE 386 - todo  */
 
-			Ray ray = camera.getRay(x, y);
-
-			color col = traceIndividualRay(ray, theScene, 3);
-
-			frameBuffer.setColor(x, y, col);
+			if (N < 2) {
+				Ray ray = camera.getRay(x, y);
+				color col = traceIndividualRay(ray, theScene, depth);
+				frameBuffer.setColor(x, y, col);
+			}
+			else {
+				// This is for Antialiasing 
+                // Implement this in the project 
+                /*
+                std::vector<Ray> rays = theScene.camera->getAARays(x, y, N);
+				color colorForPixel = black;
+				for (auto& ray : rays) {
+					colorForPixel += traceIndividualRay(ray, theScene, depth);
+				}
+				colorForPixel /= rays.size();
+				frameBuffer.setColor(x, y, colorForPixel);
+			    */
+            }
 
 			// frameBuffer.showAxes(x, y, ray, 0.25);			// Displays R/x, G/y, B/z axes
 		}
@@ -74,6 +86,13 @@ color RayTracer::traceIndividualRay(const Ray& ray, const IScene& theScene, int 
 
 	if (hit.t < FLT_MAX) {
         color accumulatedColor = black;
+
+        if (hit.texture != nullptr) {
+            color texelColor = hit.texture->getPixelUV(hit.u, hit.v);
+
+            hit.material.ambient = 0.15 * texelColor; // 0.15 is arbitrary
+            hit.material.diffuse = texelColor;
+        }
 
         for (auto& light : theScene.lights) {
             dvec3 normal = hit.normal;

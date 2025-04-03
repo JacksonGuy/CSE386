@@ -179,12 +179,6 @@ bool PositionalLight::pointIsInAShadow(const dvec3& intercept,
     OpaqueHitRecord shadowHit;
     VisibleIShape::findIntersection(shadowFeeler, objects, shadowHit);
 
-    if (shadowHit.t > distToLight) {
-        return false;
-    }
-
-    return true;
-
     return (shadowHit.t > distToLight) ? false : true;
 }
 
@@ -225,8 +219,21 @@ color SpotLight::illuminate(const dvec3& interceptWorldCoords,
 	const dvec3& normal,
 	const Material& material,
 	const Frame& eyeFrame,
-	bool inShadow) const {
-	/* CSE 386 - todo  */
+	bool inShadow) const 
+{
+	if (this->isInSpotlightCone(this->pos, this->spotDir, 
+        this->fov, interceptWorldCoords)) 
+    {
+        double spotCutoffCosine = glm::cos(this->fov / 2.0);
+        double spotCosine = glm::dot(spotDir, glm::normalize(interceptWorldCoords - this->pos));
+        double falloffFactor = 1.0 - ((1.0 - spotCosine) / (1.0 - spotCutoffCosine));
+        
+        // double falloffFactor = 1.0f;
+
+        return falloffFactor * PositionalLight::illuminate(interceptWorldCoords, 
+            normal, material, eyeFrame, inShadow);    
+    }
+
 	return black;
 }
 
@@ -254,7 +261,10 @@ void SpotLight::setDir(double dx, double dy, double dz) {
 bool SpotLight::isInSpotlightCone(const dvec3& spotPos,
 	const dvec3& spotDir,
 	double spotFOV,
-	const dvec3& intercept) {
-	/* CSE 386 - todo  */
-	return false;
+	const dvec3& intercept) 
+{
+	double spotCutoffCosine = glm::cos(spotFOV / 2.0);
+    double spotCosine = glm::dot(spotDir, glm::normalize(intercept - spotPos));
+
+	return (spotCosine > spotCutoffCosine) ? true : false;
 }
