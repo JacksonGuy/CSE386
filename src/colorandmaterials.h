@@ -36,6 +36,8 @@ struct Material {
 	color specular;		//!< specular material property
 	double shininess;	//!< shininess material property
 
+    double alpha = 1.0f;
+
 	Material() : Material(black, black, black, 0.0) {}
 	Material(const color& amb, const color& diff,
 		const color& spec, double shininess);

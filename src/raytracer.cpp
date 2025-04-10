@@ -46,7 +46,8 @@ void RayTracer::raytraceScene(FrameBuffer& frameBuffer, int depth,
 				Ray ray = camera.getRay(x, y);
 				color col = traceIndividualRay(ray, theScene, depth);
 				frameBuffer.setColor(x, y, col);
-			}
+			    //frameBuffer.showAxes(x, y, ray, 0.25);
+            }
 			else {
 				// This is for Antialiasing 
                 // Implement this in the project 
@@ -60,8 +61,6 @@ void RayTracer::raytraceScene(FrameBuffer& frameBuffer, int depth,
 				frameBuffer.setColor(x, y, colorForPixel);
 			    */
             }
-
-			// frameBuffer.showAxes(x, y, ray, 0.25);			// Displays R/x, G/y, B/z axes
 		}
 	}
 
@@ -125,7 +124,14 @@ color RayTracer::traceIndividualRay(const Ray& ray, const IScene& theScene, int 
 			Ray reflectionRay(hit.interceptPt + EPSILON * hit.normal, glm::reflect(ray.dir, hit.normal));
 
 			accumulatedColor += 0.5 * traceIndividualRay(reflectionRay, theScene, recursionLevel - 1);
-		}
+		
+            if (hit.material.alpha < 1.0) {
+                dvec3 refractionDir = ray.dir;
+                Ray refractRay(hit.interceptPt - EPSILON * hit.normal, refractionDir);
+                color refractColor = traceIndividualRay(refractRay, theScene, recursionLevel);
+                accumulatedColor = (1.0 - hit.material.alpha) * accumulatedColor + hit.material.alpha * refractColor;
+            }
+        }
 
 		// return accumulatedColor;
 	    return glm::clamp(accumulatedColor, 0.0, 1.0);

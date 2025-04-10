@@ -205,8 +205,10 @@ void IDisk::findClosestIntersection(const Ray& ray, HitRecord& hit) const {
 
 void IDisk::getTexCoords(const dvec3& pt, double& u, double& v) const {
 	// The following works only for disks oriented with a normal vector = <0, 0, 1>
-	u = map(pt.x, center.x - radius, center.x + radius, 0.0, 1.0);
-	v = map(pt.y, center.y - radius, center.y + radius, 0.0, 1.0);
+	Frame diskFrame = Frame::createOrthoNormalBasis(center, n);
+    dvec3 diskPos = diskFrame.globalCoordToFrameCoords(pt);
+    u = map(diskPos.x, -radius, +radius, 0.0, 1.0);
+	v = map(diskPos.y, -radius, +radius, 0.0, 1.0);
 	v = 1.0 - v;
 }
 

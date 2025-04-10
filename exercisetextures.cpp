@@ -40,15 +40,15 @@ RayTracer rayTrace(paleGreen);
 PositionalLightPtr posLight = new PositionalLight(dvec3(10.0, 15.0, 15.0), white);
 
 void buildScene() {
-	//IShapePtr cylinder1 = new ICylinderY(dvec3(0, 0, 0), 3.0, 10.0);
-	ISphere* sphere1 = new ISphere(dvec3(0,0,0), 3.0);
+	IShapePtr cylinder1 = new ICylinderY(dvec3(0, 0, 0), 3.0, 10.0);
+	//ISphere* sphere1 = new ISphere(dvec3(0,0,0), 3.0);
     IShapePtr cylinder2 = new ICylinderY(dvec3(6, 0, -8), 2.0, 5.0);
 	IShapePtr cylinder3 = new ICylinderY(dvec3(10, 0, 0), 3.0, 5.0);
 	IShapePtr disk1 = new IDisk(dvec3(-5, 0, 6), dvec3(0, 0, 1), 3);
 	IShapePtr disk2 = new IDisk(dvec3(-9, 0, 5), dvec3(0, 0, 1), 3);
 
-	//theScene.addOpaqueObject(new VisibleIShape(cylinder1, gold, &im1));
-	theScene.addOpaqueObject(new VisibleIShape(sphere1, gold, &im2));
+	theScene.addOpaqueObject(new VisibleIShape(cylinder1, gold, &im1));
+	//theScene.addOpaqueObject(new VisibleIShape(sphere1, gold, &im2));
     theScene.addOpaqueObject(new VisibleIShape(cylinder2, brass));
 	theScene.addOpaqueObject(new VisibleIShape(cylinder3, gold, &im1));
 	theScene.addOpaqueObject(new VisibleIShape(disk1, gold, &im1));
