@@ -38,6 +38,12 @@ struct Material {
 
     double alpha = 1.0f;
 
+    /** @brief	index of refraction for the material  */
+	double dielectricRefractionIndex = 1.0;
+
+	/** @brief	True if is dielectric and therefore transmits and reflects light, false if not */
+	bool isDielectric = false;
+
 	Material() : Material(black, black, black, 0.0) {}
 	Material(const color& amb, const color& diff,
 		const color& spec, double shininess);

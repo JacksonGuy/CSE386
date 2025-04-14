@@ -25,6 +25,8 @@ struct HitRecord {
 	}
 };
 
+enum RAY_STATUS { ENTERING, LEAVING };
+	
 /**
  * @struct	OpaqueHitRecord
  * @brief	Stores information regarding a ray-object intersection for solid objects.
@@ -52,6 +54,12 @@ struct OpaqueHitRecord : HitRecord {
 		}
 		return theClosestHit;
 	}
+
+    /** @brief	Added to support transparency. Indicates whether if the ray   
+	    is enter an enclosed object or leaving it. Assumes all rays original 
+	    outside of any transparent object.*/
+	
+	RAY_STATUS rayStatus = ENTERING;
 };
 
 /**

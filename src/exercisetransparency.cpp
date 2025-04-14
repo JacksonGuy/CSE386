@@ -74,20 +74,20 @@ void resize(int width, int height) {
 
 void buildScene() {
 
-	//Material mirror(color(0.1, 0.1, 0.1), color(0.2, 0.2, 0.3), color(1.0, 1.0, 1.0), 128.0);
-	//mirror.isDielectric = true;
-	//mirror.dielectricRefractionIndex = 1.5;
+	Material mirror(color(0.1, 0.1, 0.1), color(0.2, 0.2, 0.3), color(1.0, 1.0, 1.0), 128.0);
+	mirror.isDielectric = true;
+	mirror.dielectricRefractionIndex = 1.5;
 	
 	Material greenTransparent(color(0.15, 0.3, 0.15), color(0.55, 0.85, 0.55), color(1.0, 1.0, 1.0), 128.0);
 
-	greenTransparent.alpha = 0.5;
+	greenTransparent.alpha = 0.2;
 	
-	scene.addOpaqueObject(new VisibleIShape(verticalPlane, greenTransparent));
+	//scene.addOpaqueObject(new VisibleIShape(verticalPlane, greenTransparent));
 
 	scene.addOpaqueObject(new VisibleIShape(plane, tin));
 
-	//scene.addOpaqueObject(new VisibleIShape(sphere1, mirror, &im2));
-	scene.addOpaqueObject(new VisibleIShape(ellipsoid, redPlastic));
+	scene.addOpaqueObject(new VisibleIShape(sphere1, mirror, &im2));
+	scene.addOpaqueObject(new VisibleIShape(ellipsoid, mirror));
 
 	scene.addOpaqueObject(new VisibleIShape(cylinderY, gold, &im1));
 	scene.addOpaqueObject(new VisibleIShape(disk, redPlastic, &im1));
