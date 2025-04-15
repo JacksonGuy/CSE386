@@ -210,6 +210,18 @@ struct ICylinderY : public ICylinder {
 };
 
 /**
+ * @struct ICylinderYClose
+ * @brief Closed Cylinder oriented along the y-axis
+ */
+struct IClosedCylinderY : public ICylinderY {
+    IDisk *top, *bottom;
+    IClosedCylinderY();
+    IClosedCylinderY(const dvec3& position, const double R, const double len);
+    virtual void findClosestIntersection(const Ray& ray, HitRecord& hit) const;
+    void getTexCoords(const dvec3& pt, double& u, double& v) const;
+};
+
+/**
  * @struct	IEllipsoid
  * @brief	Implicit representation of an ellipsoid.
  */

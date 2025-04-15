@@ -36,8 +36,7 @@ double spotDirX = 0;
 double spotDirY = -1;
 double spotDirZ = 0;
 
-dvec3 cameraPos(16, 3, 16); /**/
-dvec3 cameraFocus(0, 0, 0);
+dvec3 cameraPos(16, 3, 16); /**/ dvec3 cameraFocus(0, 0, 0);
 dvec3 cameraUp = Y_AXIS;
 
 double cameraFOV = glm::radians(60.0);/**/
@@ -69,8 +68,6 @@ void resize(int width, int height) {
 	frameBuffer.setFrameBufferSize(width, height);
 	glutPostRedisplay();
 }
-
-
 
 void buildScene() {
 

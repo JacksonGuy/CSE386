@@ -46,7 +46,7 @@ void RayTracer::raytraceScene(FrameBuffer& frameBuffer, int depth,
 				Ray ray = camera.getRay(x, y);
 				color col = traceIndividualRay(ray, theScene, depth);
 				frameBuffer.setColor(x, y, col);
-			    //frameBuffer.showAxes(x, y, ray, 0.25);
+			    frameBuffer.showAxes(x, y, ray, 0.25);
             }
 			else {
 				// This is for Antialiasing 

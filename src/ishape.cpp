@@ -179,10 +179,9 @@ IDisk::IDisk(const dvec3& pos, const dvec3& normal, double rad)
  */
 
 void IDisk::findClosestIntersection(const Ray& ray, HitRecord& hit) const {
-	//hit.t = FLT_MAX;
+	hit.t = FLT_MAX;
     
     IPlane plane(this->center, this->n);
-    //HitRecord hr;
     plane.findClosestIntersection(ray, hit);
 
     if (hit.t == FLT_MAX) {
@@ -807,6 +806,76 @@ void ICylinderY::getTexCoords(const dvec3& pt, double& u, double& v) const {
 
     v = map(pt.y, bottom, top, 1.0, 0.0);
     u = map(azimuthAngle, 0.0, TWO_PI, 0.0, 1.0);
+}
+
+/**
+ * @brief default constructor
+ */
+IClosedCylinderY::IClosedCylinderY() : ICylinderY() {
+    this->top = new IDisk(
+        dvec3(this->center.x, this->center.y + this->length/2, this->center.z),
+        dvec3(0, 1, 0),
+        this->radius
+    );
+    this->bottom = new IDisk(
+        dvec3(this->center.x, this->center.y - this->length/2, this->center.z),
+        dvec3(0, -1, 0),
+        this->radius
+    );
+}
+
+/**
+ * @brief Constructor
+ * @param position the position
+ * @param R radians
+ * @param len the length
+ */
+IClosedCylinderY::IClosedCylinderY(const dvec3& position, const double R, const double len)
+    : ICylinderY(position, R, len)
+{
+    this->top = new IDisk(
+        dvec3(this->center.x, this->center.y + len/2, this->center.z),
+        dvec3(0, 1, 0),
+        this->radius
+    );
+    this->bottom = new IDisk(
+        dvec3(this->center.x, this->center.y - len/2, this->center.z),
+        dvec3(0, -1, 0),
+        this->radius
+    );
+}
+
+/**
+ * @brief
+ */
+void IClosedCylinderY::findClosestIntersection(const Ray& ray, HitRecord& hit) const {
+    hit.t = FLT_MAX;
+
+    HitRecord hits[3];
+    ICylinderY::findClosestIntersection(ray, hits[0]);
+    this->top->findClosestIntersection(ray, hits[1]);
+    this->bottom->findClosestIntersection(ray, hits[2]);
+
+    for (int i = 0; i < 3; i++) {
+        if (hits[i].t < hit.t) {
+            hit = hits[i];
+        }
+    }
+}
+
+/**
+ * @brief
+ */
+void IClosedCylinderY::getTexCoords(const dvec3& pt, double& u, double& v) const {
+    if (pt.y > this->center.y + this->length/2) {
+        this->top->getTexCoords(pt, u, v);
+    }
+    else if (pt.y < this->center.y - this->length/2) {
+        this->bottom->getTexCoords(pt, u, v);
+    }
+    else {
+        ICylinderY::getTexCoords(pt, u, v);
+    }
 }
 
 /**
