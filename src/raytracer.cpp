@@ -43,15 +43,14 @@ void RayTracer::raytraceScene(FrameBuffer& frameBuffer, int depth,
 			}
 
 			if (N < 2) {
-				Ray ray = camera.getRay(x, y);
+				// No Anti Aliasing
+                Ray ray = camera.getRay(x, y);
 				color col = traceIndividualRay(ray, theScene, depth);
 				frameBuffer.setColor(x, y, col);
 			    frameBuffer.showAxes(x, y, ray, 0.25);
             }
 			else {
-				// This is for Antialiasing 
-                // Implement this in the project 
-                /*
+				// Anti Aliasing 
                 std::vector<Ray> rays = theScene.camera->getAARays(x, y, N);
 				color colorForPixel = black;
 				for (auto& ray : rays) {
@@ -59,7 +58,6 @@ void RayTracer::raytraceScene(FrameBuffer& frameBuffer, int depth,
 				}
 				colorForPixel /= rays.size();
 				frameBuffer.setColor(x, y, colorForPixel);
-			    */
             }
 		}
 	}

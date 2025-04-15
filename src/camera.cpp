@@ -157,6 +157,28 @@ Ray OrthographicCamera::getRay(double x, double y) const {
 }
 
 /**
+ * @fn std::vector<Ray> OrthographicCamera::getAARays(double x, double y, int N) const
+ * @brief   Returns the rays for Anti Aliasing
+ * @param   x   The x coordinate
+ * @param   y   The y coordinate
+ * @param   N   The size of the grid to gather rays from
+ * @return  vector of rays 
+ */
+
+std::vector<Ray> OrthographicCamera::getAARays(double x, double y, int N) const {
+    std::vector<Ray> rays;
+    double inc = 1.0 / (2 * N);
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            double sx = map(x + inc, 0, nx, left, right);
+            double sy = map(y + inc, 0, ny, bottom, top);
+            rays.push_back(Ray(cameraFrame.origin + sx * cameraFrame.u + sy, -cameraFrame.w));
+        }
+    }
+    return rays;
+}
+
+/**
  * @fn	Ray PerspectiveCamera::getRay(double x, double y) const
  * @brief	Determines ray eminating from camera through the projection plane at (x, y).
  * @param	x	The x coordinate.
@@ -170,6 +192,35 @@ Ray PerspectiveCamera::getRay(double x, double y) const {
 		uv.x * cameraFrame.u +
 		uv.y * cameraFrame.v);
 	return Ray(cameraFrame.origin, rayDirection);
+}
+
+/**
+ * @fn std::vector<Ray> PerspectiveCamera::getAARays(double x, double y, int N) const
+ * @brief   Returns the rays for Anti Aliasing
+ * @param   x   The x coordinate
+ * @param   y   The y coordinate
+ * @param   N   The size of the grid to gather rays from
+ * @return  vector of rays 
+ */
+
+std::vector<Ray> PerspectiveCamera::getAARays(double x, double y, int N) const {
+    std::vector<Ray> rays;
+    double inc = 1.0 / (2 * N);
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            double sx = map(x + inc, 0, nx, left, right);
+            double sy = map(y + inc, 0, ny, bottom, top);
+        
+            dvec3 rayDir = glm::normalize(
+                -distToPlane * cameraFrame.w +
+                sx * cameraFrame.u + 
+                sy * cameraFrame.v
+            );
+
+            rays.push_back(Ray(cameraFrame.origin, rayDir));
+        }
+    }
+    return rays;
 }
 
 /**

@@ -20,7 +20,8 @@ struct RaytracingCamera {
 	RaytracingCamera(const dvec3& pos, const dvec3& lookAtPt, const dvec3& up,
 		int width, int height);
 	virtual Ray getRay(double x, double y) const = 0;
-	Frame getFrame() const { return cameraFrame; }
+	virtual std::vector<Ray> getAARays(double x, double y, int N) const = 0;
+    Frame getFrame() const { return cameraFrame; }
 	int getNX() const { return nx; }
 	int getNY() const { return ny; }
 	double getLeft() const { return left; }
@@ -49,6 +50,7 @@ struct PerspectiveCamera : public RaytracingCamera {
 	PerspectiveCamera(const dvec3& pos, const dvec3& lookAtPt, const dvec3& up, double FOVRads,
 		int width, int height);
 	virtual Ray getRay(double x, double y) const;
+    virtual std::vector<Ray> getAARays(double x, double y, int N) const;
 	double getDistToPlane() const { return distToPlane; }
 private:
 	double fov;						//!< The camera's field of view
@@ -65,6 +67,7 @@ struct OrthographicCamera : public RaytracingCamera {
 	OrthographicCamera(const dvec3& pos, const dvec3& lookAtPt, const dvec3& up,
 		int width, int height, double scaleFactor = 1.0);
 	virtual Ray getRay(double x, double y) const;
+    virtual std::vector<Ray> getAARays(double x, double y, int N) const;
 private:
 	double scale;		//!< Controls the size of the image plane.
 	virtual void setupViewingParameters(int width, int height);

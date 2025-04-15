@@ -599,8 +599,8 @@ dvec3 pointingVector(const dvec3& pt1, const dvec3& pt2) {
 */
 
 dvec3 getRow(const dmat3& mat, int row) {
-	/* CSE 386 - todo  */
-	return dvec3(0, 0, 0);
+    // Matrices are stored as column major
+	return dvec3(mat[0][row], mat[1][row], mat[2][row]);
 }
 
 /**
@@ -612,8 +612,7 @@ dvec3 getRow(const dmat3& mat, int row) {
  */
 
 dvec3 getCol(const dmat3& mat, int col) {
-	/* CSE 386 - todo  */
-	return dvec3(0, 0, 0);
+	return mat[col];
 }
 
 /**
@@ -625,8 +624,7 @@ dvec3 getCol(const dmat3& mat, int col) {
  */
 
 bool isInvertible(const dmat3& mat) {
-	/* CSE 386 - todo  */
-	return false;
+	return (glm::determinant(mat) != 0.0);
 }
 
 /**
@@ -637,8 +635,11 @@ bool isInvertible(const dmat3& mat) {
  */
 
 dmat3 addMatrices(const vector<dmat3>& M) {
-	/* CSE 386 - todo  */
-	return dmat3(0, 0, 0, 0, 0, 0, 0, 0, 0);
+    dmat3 result(0,0,0, 0,0,0, 0,0,0);
+    for (const dmat3& mat : M) {
+        result += mat;
+    }
+    return result;
 }
 
 /**

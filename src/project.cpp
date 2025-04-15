@@ -226,6 +226,11 @@ int main(int argc, char** argv) {
     Image im1("usflag.ppm");
     Image im2("earth.ppm");
 
+    // Custom Materials
+    Material mirror(color(0.1, 0.1, 0.1), color(0.2, 0.2, 0.3), color(1.0, 1.0, 1.0), 128.0);
+	mirror.isDielectric = true;
+	mirror.dielectricRefractionIndex = 1.5;
+
     // Create Lights
     PositionalLight* posLight = new PositionalLight(dvec3(15, 15, 15), white);
     Project::lights.push_back(posLight);
@@ -249,14 +254,14 @@ int main(int argc, char** argv) {
     ISphere* sphere1 = new ISphere(dvec3(0.0, 2.0, 0.0), 4.0);
     IClosedCylinderY* cylinder1 = new IClosedCylinderY(dvec3(8.0, 0.0, 4.0), 1.5, 3.0);
     ICylinderY* cylinder2 = new ICylinderY(dvec3(2.0, 0.0, 8.0), 1.5, 3.0);
-    IDisk* disk = new IDisk(dvec3(7.0, 4.0, -4.0), dvec3(0, 0, 1), 3);
+    IDisk* disk = new IDisk(dvec3(-8, 1.0, 8.0), dvec3(1, 0, 0), 3);
 
     // Add objects to scene
     Project::scene.addOpaqueObject(new VisibleIShape(plane, tin));
     Project::scene.addOpaqueObject(new VisibleIShape(sphere1, white, &im2));
     Project::scene.addOpaqueObject(new VisibleIShape(cylinder1, copper));
     Project::scene.addOpaqueObject(new VisibleIShape(cylinder2, copper, &im1));
-    Project::scene.addOpaqueObject(new VisibleIShape(disk, turquoise));
+    Project::scene.addOpaqueObject(new VisibleIShape(disk, mirror));
 
     // Start Program
     glutMainLoop();
