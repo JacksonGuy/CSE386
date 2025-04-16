@@ -888,3 +888,64 @@ void IClosedCylinderY::getTexCoords(const dvec3& pt, double& u, double& v) const
 IEllipsoid::IEllipsoid(const dvec3& position, const dvec3& sz)
 	: IQuadricSurface(QuadricParameters::ellipsoidQParams(sz), position) {
 }
+
+/**
+ * @fn ITriangle::ITriangle(const dvec3& A, const dvec3& B, const dvec3& C)
+ * @brief Constructor for triangle shape.
+ * @param A the first vertex
+ * @param B the second vertex
+ * @param C the third vertex
+ */
+
+ITriangle::ITriangle(const dvec3& A, const dvec3& B, const dvec3& C) : IShape() {
+    this->a = A;
+    this->b = B;
+    this->c = C;
+}
+
+/** 
+ * @fn void ITriangle::findClosestIntersection(const Ray& ray, HitRecord& hit) const
+ * @brief Finds the nearest intersection with the triangle
+ * @param ray The ray
+ * @param hit The hit record
+ */ 
+
+void ITriangle::findClosestIntersection(const Ray& ray, HitRecord& hit) const {
+    dvec3 n = normalFrom3Points(this->a, this->b, this->c);
+    IPlane plane(this->a, this->b, this->c);
+
+    plane.findClosestIntersection(ray, hit);
+
+    if (hit.t < FLT_MAX && !inside(hit.interceptPt)) {
+        hit.t = FLT_MAX;
+    }
+}
+
+/**
+ * @fn bool ITriangle::inside(const dvec3& pt) const
+ * @brief Determines if the given point is inside the triangle
+ * @param pt the point
+ * @return true if the point is inside the triangle
+ */
+
+bool ITriangle::inside(const dvec3& pt) const {
+    double thisArea = areaOfTriangle(this->a, this->b, this->c);
+    
+    double area1 = areaOfTriangle(this->a, this->b, pt);
+    double area2 = areaOfTriangle(this->a, pt, this->c);
+    double area3 = areaOfTriangle(pt, this->b, this->c);
+    double sum = area1 + area2 + area3;
+
+    return approximatelyEqual(thisArea, sum);
+}
+
+
+void ITriangle::getTexCoords(const dvec3& pt, double& u, double& v) const {
+    double thisArea = areaOfTriangle(this->a, this->b, this->c);
+
+    double BCP = areaOfTriangle(pt, this->b, this->c);
+    double CAP = areaOfTriangle(this->a, pt, this->c);
+
+    u = BCP / thisArea;
+    v = CAP / thisArea;
+}

@@ -32,8 +32,8 @@ namespace Project {
     std::vector<PositionalLight*> lights;
     SpotLight* spotlight = nullptr;
     int currentLight = 0;
-    double spotDirX = 0;
-    double spotDirY = -1;
+    double spotDirX = -1;
+    double spotDirY = 0;
     double spotDirZ = 0;
     double spotAngle = 120;
 
@@ -238,7 +238,7 @@ int main(int argc, char** argv) {
     posLight->isOn = true;
 
     SpotLight* spotlight = new SpotLight(
-        dvec3(-15, 5, 10),
+        dvec3(15, 5, 10),
         dvec3(Project::spotDirX, Project::spotDirY, Project::spotDirZ),
         glm::radians(Project::spotAngle),
         white
@@ -255,6 +255,11 @@ int main(int argc, char** argv) {
     IClosedCylinderY* cylinder1 = new IClosedCylinderY(dvec3(8.0, 0.0, 4.0), 1.5, 3.0);
     ICylinderY* cylinder2 = new ICylinderY(dvec3(2.0, 0.0, 8.0), 1.5, 3.0);
     IDisk* disk = new IDisk(dvec3(-8, 1.0, 8.0), dvec3(1, 0, 0), 3);
+    ITriangle* triangle = new ITriangle(
+        dvec3(6.0, 3.0, 0.0),
+        dvec3(10.0, 3.0, 0.0),
+        dvec3(8.0, 6.0, 0.0)
+    );
 
     // Add objects to scene
     Project::scene.addOpaqueObject(new VisibleIShape(plane, tin));
@@ -262,6 +267,7 @@ int main(int argc, char** argv) {
     Project::scene.addOpaqueObject(new VisibleIShape(cylinder1, copper));
     Project::scene.addOpaqueObject(new VisibleIShape(cylinder2, copper, &im1));
     Project::scene.addOpaqueObject(new VisibleIShape(disk, mirror));
+    Project::scene.addOpaqueObject(new VisibleIShape(triangle, turquoise));
 
     // Start Program
     glutMainLoop();

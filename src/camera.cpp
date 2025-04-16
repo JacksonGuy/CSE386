@@ -168,10 +168,10 @@ Ray OrthographicCamera::getRay(double x, double y) const {
 std::vector<Ray> OrthographicCamera::getAARays(double x, double y, int N) const {
     std::vector<Ray> rays;
     double inc = 1.0 / (2 * N);
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            double sx = map(x + inc, 0, nx, left, right);
-            double sy = map(y + inc, 0, ny, bottom, top);
+    for (int i = 0; i < N + 1; i++) {
+        for (int j = 0; j < N + 1; j++) {
+            double sx = map(x + (1.0 / (2 * N)) + (inc * i), 0, nx, left, right);
+            double sy = map(y + (1.0 / (2 * N)) + (inc * j), 0, ny, bottom, top);
             rays.push_back(Ray(cameraFrame.origin + sx * cameraFrame.u + sy, -cameraFrame.w));
         }
     }
@@ -205,11 +205,11 @@ Ray PerspectiveCamera::getRay(double x, double y) const {
 
 std::vector<Ray> PerspectiveCamera::getAARays(double x, double y, int N) const {
     std::vector<Ray> rays;
-    double inc = 1.0 / (2 * N);
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            double sx = map(x + inc, 0, nx, left, right);
-            double sy = map(y + inc, 0, ny, bottom, top);
+    double inc = 1.0 / N;
+    for (int i = 1; i < N + 1; i++) {
+        for (int j = 1; j < N + 1; j++) {
+            double sx = map(x + (1.0 / (2 * N)) + (inc * i), 0, nx, left, right);
+            double sy = map(y + (1.0 / (2 * N)) + (inc * j), 0, ny, bottom, top);
         
             dvec3 rayDir = glm::normalize(
                 -distToPlane * cameraFrame.w +

@@ -229,3 +229,17 @@ struct IClosedCylinderY : public ICylinderY {
 struct IEllipsoid : public IQuadricSurface {
 	IEllipsoid(const dvec3& position, const dvec3& sz);
 };
+
+/**
+ * @struct ITriangle
+ * @brief Implicit representation of a triangle.
+ */
+struct ITriangle : public IShape {
+    dvec3 a;
+    dvec3 b;
+    dvec3 c;
+    ITriangle(const dvec3& A, const dvec3& B, const dvec3& C);
+    virtual void findClosestIntersection(const Ray& ray, HitRecord& hit) const;
+    bool inside(const dvec3& pt) const;
+    void getTexCoords(const dvec3& pt, double& u, double& v) const; 
+};
