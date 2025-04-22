@@ -81,7 +81,7 @@ string extractBaseFilename(const string& str);
 // 2D versions
 dmat3 T(double dx, double dy);
 dmat3 S(double sx, double sy);
-dmat3 R(double deg);
+dmat3 R(double rad);
 dmat3 vertShear(double a);
 dmat3 horzShear(double a);
 

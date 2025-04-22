@@ -650,8 +650,12 @@ dmat3 addMatrices(const vector<dmat3>& M) {
  */
 
 dmat3 multiplyMatrices(const vector<dmat3>& M) {
-	/* CSE 386 - todo  */
-	dmat3 result;
+	dmat3 result = M[0];
+
+    for (size_t i = 1; i < M.size(); i++) {
+        result *= M[i];
+    }
+
 	return result;
 }
 
@@ -664,8 +668,7 @@ dmat3 multiplyMatrices(const vector<dmat3>& M) {
  */
 
 dvec3 multiplyMatrixAndVertex(const dmat3& M, const dvec3& x) {
-	/* CSE 386 - todo  */
-	return dvec3(0, 0, 0);
+	return M * x;
 }
 
 /**
@@ -677,8 +680,7 @@ dvec3 multiplyMatrixAndVertex(const dmat3& M, const dvec3& x) {
  */
 
 dvec3 multiplyMatricesAndVertex(const vector<dmat3>& M, const dvec3& x) {
-	/* CSE 386 - todo  */
-	return dvec3(0, 0, 0);
+	return multiplyMatrices(M) * x;
 }
 
 /**
@@ -690,8 +692,12 @@ dvec3 multiplyMatricesAndVertex(const vector<dmat3>& M, const dvec3& x) {
  */
 
 vector<dvec3> multiplyMatrixAndVertices(const dmat3& M, const vector<dvec3>& verts) {
-	/* CSE 386 - todo  */
 	vector<dvec3> result;
+
+    for (auto& v : verts) {
+        result.push_back(M * v);
+    }
+
 	return result;
 }
 
@@ -705,9 +711,8 @@ vector<dvec3> multiplyMatrixAndVertices(const dmat3& M, const vector<dvec3>& ver
  */
 
 vector<dvec3> multiplyMatricesAndVertices(const vector<dmat3>& M, const vector<dvec3>& verts) {
-	/* CSE 386 - todo  */
-	vector<dvec3> result;
-	return result;
+    dmat3 composite = multiplyMatrices(M);
+    return multiplyMatrixAndVertices(composite, verts);
 }
 
 /**
