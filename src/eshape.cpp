@@ -45,12 +45,23 @@ EShapeData EShape::createEDisk(const Material& mat, int slices) {
  */
 
 EShapeData EShape::createECylinder(const Material& mat, int slices) {
-	/* CSE 386 - todo  */
 	EShapeData result;
-	dvec4 A(0, 0, 0, 1);
-	dvec4 B(1, 1, 1, 1);
-	dvec4 C(0, 1, 0, 1);
-	VertexData::addTriVertsAndComputeNormal(result, A, B, C, mat);
+
+    double sliceInc = TWO_PI / slices;
+
+    for (int i = 0; i < slices; i++) {
+        double angleOne = i * sliceInc;  
+        double angleTwo = angleOne + sliceInc;
+
+        dvec4 vertexOne(glm::cos(angleOne), -1.0, glm::sin(angleOne), 1.0);
+        dvec4 vertexTwo(glm::cos(angleTwo), -1.0, glm::sin(angleTwo), 1.0);
+        dvec4 vertexThree(glm::cos(angleOne), 1.0, glm::sin(angleOne), 1.0);
+        dvec4 vertexFour(glm::cos(angleTwo), 1.0, glm::sin(angleTwo), 1.0);
+
+        VertexData::addTriVertsAndComputeNormal(result, vertexOne, vertexTwo, vertexThree, mat);
+        VertexData::addTriVertsAndComputeNormal(result, vertexTwo, vertexThree, vertexFour, mat);
+    }
+
 	return result;
 }
 
@@ -63,8 +74,21 @@ EShapeData EShape::createECylinder(const Material& mat, int slices) {
  */
 
 EShapeData EShape::createECone(const Material& mat, int slices) {
-	/* CSE 386 - todo  */
 	EShapeData result;
+
+    double sliceInc = TWO_PI / slices;
+    dvec4 coneTop(0.0, 1.0, 0.0, 1.0);
+
+    for (int i = 0; i < slices; i++) {
+        double angleOne = i * sliceInc;  
+        double angleTwo = angleOne + sliceInc;
+
+        dvec4 vertexOne(glm::cos(angleOne), 0.0, glm::sin(angleOne), 1.0);
+        dvec4 vertexTwo(glm::cos(angleTwo), 0.0, glm::sin(angleTwo), 1.0);
+
+        VertexData::addTriVertsAndComputeNormal(result, coneTop, vertexOne, vertexTwo, mat);
+    }
+
 	return result;
 }
 
